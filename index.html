@@ -1,1239 +1,1093 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网站接入 - 开发者中心</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- Three.js -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.140.1/build/three.min.js"></script>
-    <!-- Highlight.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#0066CC',
-                        secondary: '#FF6600',
-                        dark: '#333333',
-                        light: '#F5F5F5',
-                        'primary-dark': '#0052A3',
-                        'secondary-dark': '#E55A00'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif']
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' }
-                        }
-                    }
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐播放器 - 享受美妙音乐时光</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <!-- 统一的 Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1', // 靛蓝色作为主色调
+            secondary: '#ec4899', // 粉色作为辅助色
+            dark: '#121212', // 深色背景
+            'dark-light': '#1e1e1e', // 稍亮的深色背景
+            'dark-lighter': '#2d2d2d', // 更亮的深色背景
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
         }
-    </script>
-    
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .text-gradient {
-                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
-            }
-            .btn-primary {
-                @apply bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
-            }
-            .btn-secondary {
-                @apply bg-secondary hover:bg-secondary-dark text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
-            }
-            .card {
-                @apply bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-            }
-            .section-padding {
-                @apply py-20 md:py-28;
-            }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .album-rotate {
+        animation: rotate 20s linear infinite;
+      }
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
         }
-        
-        /* 自定义滚动条 */
-        ::-webkit-scrollbar {
-            width: 8px;
+        to {
+          transform: rotate(360deg);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+      }
+      .audio-wave {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+      .audio-wave .wave-bar {
+        width: 3px;
+        height: 15px;
+        background-color: #6366f1;
+        border-radius: 3px;
+        animation: wave 1.2s ease-in-out infinite;
+      }
+      .audio-wave .wave-bar:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .audio-wave .wave-bar:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .audio-wave .wave-bar:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .audio-wave .wave-bar:nth-child(5) {
+        animation-delay: 0.4s;
+      }
+      @keyframes wave {
+        0%, 100% {
+          height: 5px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #0066CC;
-            border-radius: 4px;
+        50% {
+          height: 25px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0052A3;
-        }
-        
-        /* 3D背景容器 */
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        /* 代码块样式 */
-        .code-block {
-            @apply relative rounded-lg overflow-hidden;
-        }
-        .code-block pre {
-            @apply m-0 p-4 overflow-x-auto;
-        }
-        .copy-btn {
-            @apply absolute top-2 right-2 bg-white/20 hover:bg-white/30 text-white p-2 rounded cursor-pointer transition-all;
-        }
-    </style>
+      }
+    }
+  </style>
 </head>
-<body class="bg-light text-dark">
-    <!-- 导航栏 -->
-    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-md">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                        <i class="fa fa-code text-white text-xl"></i>
-                    </div>
-                    <span class="text-xl font-bold text-primary">DevConnect</span>
-                </div>
-                
-                <!-- 桌面导航 -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="font-medium hover:text-primary transition-colors">首页</a>
-                    <a href="#process" class="font-medium hover:text-primary transition-colors">接入流程</a>
-                    <a href="#docs" class="font-medium hover:text-primary transition-colors">技术文档</a>
-                    <a href="#api" class="font-medium hover:text-primary transition-colors">API参考</a>
-                    <a href="#faq" class="font-medium hover:text-primary transition-colors">常见问题</a>
-                    <button class="btn-primary">
-                        <i class="fa fa-github mr-2"></i>GitHub
-                    </button>
-                </div>
-                
-                <!-- 移动端菜单按钮 -->
-                <div class="md:hidden">
-                    <button id="menu-toggle" class="text-dark focus:outline-none">
-                        <i class="fa fa-bars text-2xl"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 移动端导航菜单 -->
-            <div id="mobile-menu" class="md:hidden hidden pb-4">
-                <div class="flex flex-col space-y-4">
-                    <a href="#home" class="font-medium hover:text-primary transition-colors py-2">首页</a>
-                    <a href="#process" class="font-medium hover:text-primary transition-colors py-2">接入流程</a>
-                    <a href="#docs" class="font-medium hover:text-primary transition-colors py-2">技术文档</a>
-                    <a href="#api" class="font-medium hover:text-primary transition-colors py-2">API参考</a>
-                    <a href="#faq" class="font-medium hover:text-primary transition-colors py-2">常见问题</a>
-                    <button class="btn-primary w-full">
-                        <i class="fa fa-github mr-2"></i>GitHub
-                    </button>
-                </div>
-            </div>
+<body class="bg-dark text-white min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-dark-light border-b border-gray-800 sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="text-primary text-2xl font-bold flex items-center">
+          <i class="fa fa-music mr-2"></i>
+          <span>音乐播放器</span>
         </div>
-    </nav>
+      </div>
+      
+      <!-- 搜索框 -->
+      <div class="hidden md:flex items-center flex-1 max-w-xl mx-8">
+        <div class="relative w-full">
+          <input type="text" id="search-input" placeholder="搜索歌曲、歌手或专辑..." 
+                 class="w-full bg-dark-lighter text-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary">
+          <i class="fa fa-search absolute left-3 top-3 text-gray-500"></i>
+        </div>
+      </div>
+      
+      <!-- 用户菜单 -->
+      <div class="flex items-center space-x-4">
+        <button class="md:hidden text-gray-300 hover:text-white">
+          <i class="fa fa-search text-xl"></i>
+        </button>
+        <button class="text-gray-300 hover:text-white">
+          <i class="fa fa-bell text-xl"></i>
+        </button>
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <span class="font-medium">U</span>
+          </div>
+          <span class="hidden md:inline font-medium">用户</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端搜索框 -->
+    <div class="md:hidden px-4 pb-3 hidden" id="mobile-search">
+      <div class="relative w-full">
+        <input type="text" placeholder="搜索歌曲、歌手或专辑..." 
+               class="w-full bg-dark-lighter text-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary">
+        <i class="fa fa-search absolute left-3 top-3 text-gray-500"></i>
+      </div>
+    </div>
+  </header>
 
-    <!-- 英雄区 -->
-    <section id="home" class="relative min-h-screen flex items-center overflow-hidden">
-        <!-- 3D背景 -->
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-blue-700/90 z-0"></div>
-        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/1517886b2e1242d8a6b2c93fb1f31a3b~tplv-a9rns2rl98-image.image?rcl=2025123121384811AC95C7D314ED111C45&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769780348&x-signature=2BSmnlYdwvkEIfhunu1z3M1iesc%3D" 
-             alt="科技背景" 
-             class="absolute inset-0 w-full h-full object-cover opacity-50 z-0">
-        
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="max-w-3xl mx-auto text-center">
-                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                    简单高效的<br>
-                    <span class="text-gradient">网站接入解决方案</span>
-                </h1>
-                <p class="text-xl md:text-2xl text-white/90 mb-8">
-                    快速集成我们的API，为您的网站添加强大功能，提升用户体验
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button class="btn-primary text-lg">
-                        <i class="fa fa-rocket mr-2"></i>立即开始
-                    </button>
-                    <button class="btn-secondary text-lg">
-                        <i class="fa fa-play-circle mr-2"></i>观看演示
-                    </button>
-                </div>
-                
-                <!-- 统计数据 -->
-                <div class="grid grid-cols-3 gap-4 mt-16 text-white">
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold">99.9%</div>
-                        <div class="text-sm opacity-80">服务可用性</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold">50ms</div>
-                        <div class="text-sm opacity-80">平均响应时间</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold">10K+</div>
-                        <div class="text-sm opacity-80">开发者使用</div>
-                    </div>
-                </div>
-            </div>
+  <!-- 主内容区 -->
+  <main class="flex-1 flex flex-col md:flex-row">
+    <!-- 左侧边栏 - 导航菜单 -->
+    <aside class="w-full md:w-64 bg-dark-light border-r border-gray-800 p-4 md:sticky md:top-16 md:h-[calc(100vh-4rem)]">
+      <nav class="space-y-6">
+        <div>
+          <h3 class="text-gray-400 text-sm font-medium mb-3">菜单</h3>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-primary font-medium">
+                <i class="fa fa-home text-xl"></i>
+                <span>首页</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-compass text-xl"></i>
+                <span>发现</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-book text-xl"></i>
+                <span>歌单</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-history text-xl"></i>
+                <span>历史记录</span>
+              </a>
+            </li>
+          </ul>
         </div>
         
-        <!-- 向下滚动指示器 -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <a href="#process" class="text-white opacity-80 hover:opacity-100">
-                <i class="fa fa-chevron-down text-2xl"></i>
-            </a>
+        <div>
+          <h3 class="text-gray-400 text-sm font-medium mb-3">我的音乐</h3>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-heart text-xl"></i>
+                <span>我喜欢的音乐</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-download text-xl"></i>
+                <span>下载的音乐</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-clock-o text-xl"></i>
+                <span>最近播放</span>
+              </a>
+            </li>
+          </ul>
         </div>
+        
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-gray-400 text-sm font-medium">创建的歌单</h3>
+            <button class="text-gray-400 hover:text-white">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-list text-xl"></i>
+                <span>工作音乐</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-list text-xl"></i>
+                <span>放松心情</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white">
+                <i class="fa fa-list text-xl"></i>
+                <span>运动健身</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 中间内容区 -->
+    <section class="flex-1 p-4 md:p-6 overflow-y-auto">
+      <!-- 英雄区域 -->
+      <div class="relative rounded-xl overflow-hidden mb-8" style="background-image: url('https://p3-doubao-search-sign.byteimg.com/labis/acff42cc6e8a0ccd9af3062794548d4f~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=gf36U2y2cqwQA%2FwrbsSWMN5EPg8%3D'); background-size: cover; background-position: center;">
+        <div class="absolute inset-0 bg-gradient-to-r from-dark to-transparent"></div>
+        <div class="relative p-6 md:p-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div class="w-32 h-32 md:w-48 md:h-48 rounded-lg overflow-hidden shadow-2xl flex-shrink-0">
+            <img src="https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D" alt="专辑封面" class="w-full h-full object-cover">
+          </div>
+          <div class="text-center md:text-left">
+            <span class="text-sm text-gray-300">专辑</span>
+            <h1 class="text-3xl md:text-5xl font-bold mt-2 text-shadow">Plini - Other Things</h1>
+            <p class="text-gray-300 mt-2">2023 · 10 首歌</p>
+            <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
+              <button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full flex items-center space-x-2 transition-all transform hover:scale-105">
+                <i class="fa fa-play"></i>
+                <span>播放</span>
+              </button>
+              <button class="bg-transparent hover:bg-white/10 text-white border border-white/30 px-6 py-2 rounded-full flex items-center space-x-2 transition-all">
+                <i class="fa fa-heart-o"></i>
+                <span>收藏</span>
+              </button>
+              <button class="bg-transparent hover:bg-white/10 text-white border border-white/30 px-3 py-2 rounded-full transition-all">
+                <i class="fa fa-ellipsis-h"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 音乐可视化区域 -->
+      <div class="bg-dark-light rounded-xl p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">音乐可视化</h2>
+        <div class="relative h-64 flex items-center justify-center">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/4d9166b77f1d40619b61f00cd430f369~tplv-a9rns2rl98-image.image?rcl=202512312207373CF9C74F02BCC21C0188&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769782092&x-signature=nvRAhzHNSPpA98Ls4bHtS7g8x%2B8%3D" alt="音乐可视化" class="w-full h-full object-cover rounded-lg">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-20 h-20 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer transform transition-all hover:scale-110">
+              <i class="fa fa-play text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门歌曲列表 -->
+      <div class="bg-dark-light rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold">热门歌曲</h2>
+          <div class="flex items-center space-x-2">
+            <button class="text-gray-400 hover:text-white transition-all">
+              <i class="fa fa-arrow-up"></i>
+            </button>
+            <button class="text-gray-400 hover:text-white transition-all">
+              <i class="fa fa-random"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[600px]">
+            <thead>
+              <tr class="text-left text-gray-400 border-b border-gray-800">
+                <th class="pb-3 pr-4 w-12">#</th>
+                <th class="pb-3 pr-4">标题</th>
+                <th class="pb-3 pr-4 hidden md:table-cell">专辑</th>
+                <th class="pb-3 pr-4 hidden sm:table-cell">时长</th>
+                <th class="pb-3 w-12"></th>
+              </tr>
+            </thead>
+            <tbody id="song-list">
+              <!-- 歌曲列表将通过JavaScript动态生成 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 推荐歌单 -->
+      <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4">推荐歌单</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <!-- 推荐歌单卡片 -->
+          <div class="bg-dark-light rounded-lg p-4 hover:bg-dark-lighter transition-all cursor-pointer transform hover:scale-105">
+            <div class="relative mb-3">
+              <div class="aspect-square rounded-md overflow-hidden">
+                <img src="https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D" alt="歌单封面" class="w-full h-full object-cover">
+              </div>
+              <button class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg opacity-0 transform translate-y-2 transition-all hover:scale-110">
+                <i class="fa fa-play"></i>
+              </button>
+            </div>
+            <h3 class="font-medium truncate">流行热歌</h3>
+            <p class="text-sm text-gray-400 truncate">最热门的流行歌曲</p>
+          </div>
+          
+          <div class="bg-dark-light rounded-lg p-4 hover:bg-dark-lighter transition-all cursor-pointer transform hover:scale-105">
+            <div class="relative mb-3">
+              <div class="aspect-square rounded-md overflow-hidden">
+                <img src="https://p26-doubao-search-sign.byteimg.com/labis/ee32e749de4ffdfba1032fa7c8132c63~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=HOx606hFFd%2F184BH1ET4rCZTGD8%3D" alt="歌单封面" class="w-full h-full object-cover">
+              </div>
+              <button class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg opacity-0 transform translate-y-2 transition-all hover:scale-110">
+                <i class="fa fa-play"></i>
+              </button>
+            </div>
+            <h3 class="font-medium truncate">经典老歌</h3>
+            <p class="text-sm text-gray-400 truncate">怀旧经典音乐</p>
+          </div>
+          
+          <div class="bg-dark-light rounded-lg p-4 hover:bg-dark-lighter transition-all cursor-pointer transform hover:scale-105">
+            <div class="relative mb-3">
+              <div class="aspect-square rounded-md overflow-hidden">
+                <img src="https://p26-doubao-search-sign.byteimg.com/labis/64e8d18a480013a8c1cf16ba8989d235~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=ubXr%2FN3h2vB9EhBAnTr8uYhbwQw%3D" alt="歌单封面" class="w-full h-full object-cover">
+              </div>
+              <button class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg opacity-0 transform translate-y-2 transition-all hover:scale-110">
+                <i class="fa fa-play"></i>
+              </button>
+            </div>
+            <h3 class="font-medium truncate">轻松爵士</h3>
+            <p class="text-sm text-gray-400 truncate">舒适放松的爵士乐</p>
+          </div>
+          
+          <div class="bg-dark-light rounded-lg p-4 hover:bg-dark-lighter transition-all cursor-pointer transform hover:scale-105">
+            <div class="relative mb-3">
+              <div class="aspect-square rounded-md overflow-hidden">
+                <img src="https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D" alt="歌单封面" class="w-full h-full object-cover">
+              </div>
+              <button class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg opacity-0 transform translate-y-2 transition-all hover:scale-110">
+                <i class="fa fa-play"></i>
+              </button>
+            </div>
+            <h3 class="font-medium truncate">电子音乐</h3>
+            <p class="text-sm text-gray-400 truncate">动感电子舞曲</p>
+          </div>
+          
+          <div class="bg-dark-light rounded-lg p-4 hover:bg-dark-lighter transition-all cursor-pointer transform hover:scale-105">
+            <div class="relative mb-3">
+              <div class="aspect-square rounded-md overflow-hidden">
+                <img src="https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D" alt="歌单封面" class="w-full h-full object-cover">
+              </div>
+              <button class="absolute bottom-2 right-2 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg opacity-0 transform translate-y-2 transition-all hover:scale-110">
+                <i class="fa fa-play"></i>
+              </button>
+            </div>
+            <h3 class="font-medium truncate">睡前放松</h3>
+            <p class="text-sm text-gray-400 truncate">安静舒缓的音乐</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 接入流程 -->
-    <section id="process" class="section-padding bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">简单三步，快速接入</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    我们提供了完整的接入流程，让您能够在最短时间内完成集成
-                </p>
+    <!-- 右侧边栏 - 正在播放 -->
+    <aside class="hidden lg:block w-80 bg-dark-light border-l border-gray-800 p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+      <div class="mb-6">
+        <h2 class="text-xl font-bold mb-4">正在播放</h2>
+        <div class="flex flex-col items-center">
+          <div class="w-64 h-64 rounded-lg overflow-hidden shadow-2xl mb-6 relative group">
+            <img src="https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D" alt="当前播放歌曲封面" class="w-full h-full object-cover album-rotate">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <button class="bg-primary/90 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transform transition-all hover:scale-110">
+                <i class="fa fa-play text-2xl"></i>
+              </button>
             </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- 步骤1 -->
-                <div class="card text-center relative">
-                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-2xl font-bold text-primary">1</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">创建开发者账号</h3>
-                    <p class="text-gray-600">
-                        注册开发者账号，获取API密钥和访问权限，开始您的接入之旅
-                    </p>
-                    <div class="absolute -right-4 top-1/2 transform -translate-y-1/2 hidden md:block">
-                        <i class="fa fa-arrow-right text-2xl text-gray-300"></i>
-                    </div>
-                </div>
-                
-                <!-- 步骤2 -->
-                <div class="card text-center relative">
-                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-2xl font-bold text-primary">2</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">集成SDK</h3>
-                    <p class="text-gray-600">
-                        选择适合您平台的SDK，按照文档说明进行简单配置即可完成集成
-                    </p>
-                    <div class="absolute -right-4 top-1/2 transform -translate-y-1/2 hidden md:block">
-                        <i class="fa fa-arrow-right text-2xl text-gray-300"></i>
-                    </div>
-                </div>
-                
-                <!-- 步骤3 -->
-                <div class="card text-center">
-                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-2xl font-bold text-primary">3</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">测试与上线</h3>
-                    <p class="text-gray-600">
-                        在测试环境中验证功能，确认无误后即可部署到生产环境
-                    </p>
-                </div>
-            </div>
-            
-            <!-- 流程图 -->
-            <div class="mt-16 bg-blue-50 rounded-xl p-8">
-                <div class="flex flex-col md:flex-row items-center justify-between">
-                    <div class="mb-6 md:mb-0 text-center md:text-left">
-                        <h3 class="text-2xl font-bold mb-2">接入流程图</h3>
-                        <p class="text-gray-600">查看详细的接入流程和技术架构</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <button class="btn-primary">
-                            <i class="fa fa-download mr-2"></i>下载文档
-                        </button>
-                        <button class="border-2 border-primary text-primary hover:bg-primary hover:text-white font-medium py-3 px-6 rounded-lg transition-all duration-300">
-                            <i class="fa fa-external-link mr-2"></i>查看详情
-                        </button>
-                    </div>
-                </div>
-            </div>
+          </div>
+          <h3 class="text-xl font-bold text-center">Other Things</h3>
+          <p class="text-gray-400 text-center">Plini</p>
         </div>
-    </section>
-
-    <!-- 技术文档 -->
-    <section id="docs" class="section-padding bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">技术文档</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    完整的API文档和SDK使用指南，帮助您快速上手
-                </p>
+      </div>
+      
+      <!-- 歌词区域 -->
+      <div class="mb-6">
+        <h3 class="text-gray-400 text-sm font-medium mb-3">歌词</h3>
+        <div class="bg-dark-lighter rounded-lg p-4 h-48 overflow-y-auto text-center">
+          <p class="text-gray-400 mb-2">Verse 1</p>
+          <p class="mb-4">Looking at the stars tonight</p>
+          <p class="mb-4">Wondering where you are</p>
+          <p class="mb-4">Thinking about the times we had</p>
+          <p class="mb-4 text-primary">Wish you were here with me</p>
+          <p class="mb-2 text-gray-400">Chorus</p>
+          <p class="mb-4">Other things on my mind</p>
+          <p class="mb-4">But you're always on my heart</p>
+          <p class="mb-4">Other things I could do</p>
+          <p class="mb-4">But I'd rather be with you</p>
+        </div>
+      </div>
+      
+      <!-- 相关推荐 -->
+      <div>
+        <h3 class="text-gray-400 text-sm font-medium mb-3">相关推荐</h3>
+        <ul class="space-y-3">
+          <li class="flex items-center space-x-3 p-2 rounded hover:bg-dark-lighter cursor-pointer">
+            <div class="w-10 h-10 rounded overflow-hidden flex-shrink-0">
+              <img src="https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D" alt="歌曲封面" class="w-full h-full object-cover">
             </div>
-            
-            <!-- 标签页导航 -->
-            <div class="mb-8">
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button class="doc-tab active bg-primary text-white px-6 py-3 rounded-lg font-medium" data-tab="javascript">
-                        <i class="fa fa-code mr-2"></i>JavaScript
-                    </button>
-                    <button class="doc-tab bg-white text-dark px-6 py-3 rounded-lg font-medium hover:bg-gray-100" data-tab="python">
-                        <i class="fa fa-python mr-2"></i>Python
-                    </button>
-                    <button class="doc-tab bg-white text-dark px-6 py-3 rounded-lg font-medium hover:bg-gray-100" data-tab="java">
-                        <i class="fa fa-coffee mr-2"></i>Java
-                    </button>
-                    <button class="doc-tab bg-white text-dark px-6 py-3 rounded-lg font-medium hover:bg-gray-100" data-tab="php">
-                        <i class="fa fa-server mr-2"></i>PHP
-                    </button>
-                </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-medium truncate">Under the Iron Sea</h4>
+              <p class="text-sm text-gray-400 truncate">Keane</p>
             </div>
-            
-            <!-- 标签页内容 -->
-            <div class="tab-content">
-                <!-- JavaScript -->
-                <div id="javascript-content" class="tab-pane active">
-                    <div class="card">
-                        <h3 class="text-2xl font-bold mb-4">JavaScript SDK 使用指南</h3>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">安装</h4>
-                            <p class="mb-4">使用 npm 或 yarn 安装 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-bash">npm install devconnect-sdk
-# 或
-yarn add devconnect-sdk</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">初始化</h4>
-                            <p class="mb-4">在您的应用中初始化 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-javascript">import DevConnect from 'devconnect-sdk';
+            <button class="text-gray-400 hover:text-primary">
+              <i class="fa fa-play"></i>
+            </button>
+          </li>
+          
+          <li class="flex items-center space-x-3 p-2 rounded hover:bg-dark-lighter cursor-pointer">
+            <div class="w-10 h-10 rounded overflow-hidden flex-shrink-0">
+              <img src="https://p26-doubao-search-sign.byteimg.com/labis/ee32e749de4ffdfba1032fa7c8132c63~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=HOx606hFFd%2F184BH1ET4rCZTGD8%3D" alt="歌曲封面" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-medium truncate">Red</h4>
+              <p class="text-sm text-gray-400 truncate">Taylor Swift</p>
+            </div>
+            <button class="text-gray-400 hover:text-primary">
+              <i class="fa fa-play"></i>
+            </button>
+          </li>
+          
+          <li class="flex items-center space-x-3 p-2 rounded hover:bg-dark-lighter cursor-pointer">
+            <div class="w-10 h-10 rounded overflow-hidden flex-shrink-0">
+              <img src="https://p26-doubao-search-sign.byteimg.com/labis/64e8d18a480013a8c1cf16ba8989d235~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=ubXr%2FN3h2vB9EhBAnTr8uYhbwQw%3D" alt="歌曲封面" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-medium truncate">Asura Balbalta</h4>
+              <p class="text-sm text-gray-400 truncate">Leessang</p>
+            </div>
+            <button class="text-gray-400 hover:text-primary">
+              <i class="fa fa-play"></i>
+            </button>
+          </li>
+          
+          <li class="flex items-center space-x-3 p-2 rounded hover:bg-dark-lighter cursor-pointer">
+            <div class="w-10 h-10 rounded overflow-hidden flex-shrink-0">
+              <img src="https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D" alt="歌曲封面" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-medium truncate">Other Things</h4>
+              <p class="text-sm text-gray-400 truncate">Plini</p>
+            </div>
+            <button class="text-gray-400 hover:text-primary">
+              <i class="fa fa-play"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </main>
 
-// 初始化 SDK
-const devconnect = new DevConnect({
-    apiKey: 'YOUR_API_KEY',
-    environment: 'production' // 或 'sandbox'
-});</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">基本用法</h4>
-                            <p class="mb-4">调用 API 示例：</p>
-                            <div class="code-block">
-                                <pre><code class="language-javascript">// 获取用户信息
-async function getUserInfo(userId) {
-    try {
-        const userInfo = await devconnect.users.get(userId);
-        console.log('用户信息:', userInfo);
-        return userInfo;
-    } catch (error) {
-        console.error('获取用户信息失败:', error);
-        throw error;
+  <!-- 底部播放控制栏 -->
+  <footer class="bg-dark-light border-t border-gray-800 py-3 px-4 sticky bottom-0 z-40">
+    <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+      <!-- 当前播放歌曲信息 -->
+      <div class="flex items-center space-x-3 mb-3 md:mb-0">
+        <div class="w-12 h-12 rounded overflow-hidden flex-shrink-0">
+          <img src="https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D" alt="当前播放歌曲封面" class="w-full h-full object-cover">
+        </div>
+        <div class="hidden sm:block">
+          <h4 class="font-medium">Other Things</h4>
+          <p class="text-xs text-gray-400">Plini</p>
+        </div>
+        <button class="text-gray-400 hover:text-primary">
+          <i class="fa fa-heart-o"></i>
+        </button>
+      </div>
+      
+      <!-- 播放控制 -->
+      <div class="flex-1 max-w-xl mx-4">
+        <div class="flex items-center justify-center space-x-4 mb-2">
+          <button class="text-gray-400 hover:text-white">
+            <i class="fa fa-random"></i>
+          </button>
+          <button class="text-gray-400 hover:text-white">
+            <i class="fa fa-step-backward"></i>
+          </button>
+          <button class="bg-white text-dark rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform">
+            <i class="fa fa-play"></i>
+          </button>
+          <button class="text-gray-400 hover:text-white">
+            <i class="fa fa-step-forward"></i>
+          </button>
+          <button class="text-gray-400 hover:text-white">
+            <i class="fa fa-repeat"></i>
+          </button>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-gray-400">1:23</span>
+          <div class="flex-1 bg-gray-700 rounded-full h-1 cursor-pointer group">
+            <div class="bg-primary h-1 rounded-full w-1/3 relative">
+              <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100"></div>
+            </div>
+          </div>
+          <span class="text-xs text-gray-400">3:45</span>
+        </div>
+      </div>
+      
+      <!-- 音量控制 -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden md:flex items-center space-x-2">
+          <button class="text-gray-400 hover:text-white">
+            <i class="fa fa-volume-up"></i>
+          </button>
+          <div class="w-24 bg-gray-700 rounded-full h-1 cursor-pointer group">
+            <div class="bg-gray-400 h-1 rounded-full w-3/4 relative">
+              <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100"></div>
+            </div>
+          </div>
+        </div>
+        <button class="text-gray-400 hover:text-white">
+          <i class="fa fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 模拟歌曲数据
+    const songs = [
+      {
+        id: 1,
+        title: "Other Things",
+        artist: "Plini",
+        album: "Other Things",
+        duration: "3:45",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D",
+        isPlaying: true
+      },
+      {
+        id: 2,
+        title: "Under the Iron Sea",
+        artist: "Keane",
+        album: "Under the Iron Sea",
+        duration: "4:12",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D",
+        isPlaying: false
+      },
+      {
+        id: 3,
+        title: "Red",
+        artist: "Taylor Swift",
+        album: "Red",
+        duration: "3:56",
+        cover: "https://p26-doubao-search-sign.byteimg.com/labis/ee32e749de4ffdfba1032fa7c8132c63~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=HOx606hFFd%2F184BH1ET4rCZTGD8%3D",
+        isPlaying: false
+      },
+      {
+        id: 4,
+        title: "Asura Balbalta",
+        artist: "Leessang",
+        album: "Asura Balbalta",
+        duration: "4:28",
+        cover: "https://p26-doubao-search-sign.byteimg.com/labis/64e8d18a480013a8c1cf16ba8989d235~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=ubXr%2FN3h2vB9EhBAnTr8uYhbwQw%3D",
+        isPlaying: false
+      },
+      {
+        id: 5,
+        title: "Midnight City",
+        artist: "M83",
+        album: "Hurry Up, We're Dreaming",
+        duration: "3:58",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D",
+        isPlaying: false
+      },
+      {
+        id: 6,
+        title: "Starboy",
+        artist: "The Weeknd",
+        album: "Starboy",
+        duration: "3:50",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D",
+        isPlaying: false
+      },
+      {
+        id: 7,
+        title: "Shape of You",
+        artist: "Ed Sheeran",
+        album: "÷ (Divide)",
+        duration: "3:53",
+        cover: "https://p26-doubao-search-sign.byteimg.com/labis/ee32e749de4ffdfba1032fa7c8132c63~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=HOx606hFFd%2F184BH1ET4rCZTGD8%3D",
+        isPlaying: false
+      },
+      {
+        id: 8,
+        title: "Blinding Lights",
+        artist: "The Weeknd",
+        album: "After Hours",
+        duration: "3:20",
+        cover: "https://p26-doubao-search-sign.byteimg.com/labis/64e8d18a480013a8c1cf16ba8989d235~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=ubXr%2FN3h2vB9EhBAnTr8uYhbwQw%3D",
+        isPlaying: false
+      },
+      {
+        id: 9,
+        title: "Dance Monkey",
+        artist: "Tones and I",
+        album: "The Kids Are Coming",
+        duration: "3:29",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/e7b1a88e685bcd5265a584c0bdbf0acc~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PP9Dr6C27%2BY9X6uPl49l3yqQAp0%3D",
+        isPlaying: false
+      },
+      {
+        id: 10,
+        title: "Save Your Tears",
+        artist: "The Weeknd",
+        album: "After Hours",
+        duration: "3:35",
+        cover: "https://p3-doubao-search-sign.byteimg.com/labis/7eb192e4a3d52b1b90be57dfeddf2df1~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782742074&x-signature=PU%2BT2ty2TchSufOBUQdAes98mDk%3D",
+        isPlaying: false
+      }
+    ];
+
+    // 当前播放的歌曲索引
+    let currentSongIndex = 0;
+    
+    // 音乐播放器状态
+    const playerState = {
+      isPlaying: false,
+      volume: 80,
+      isShuffle: false,
+      repeatMode: 'none' // 'none', 'one', 'all'
+    };
+
+    // DOM元素
+    const songListEl = document.getElementById('song-list');
+    const searchInputEl = document.getElementById('search-input');
+    const mobileSearchBtn = document.querySelector('.md\\:hidden.text-gray-300');
+    const mobileSearchEl = document.getElementById('mobile-search');
+    const playPauseBtn = document.querySelector('.bg-white.text-dark.rounded-full');
+    const prevBtn = playPauseBtn.previousElementSibling;
+    const nextBtn = playPauseBtn.nextElementSibling;
+    const shuffleBtn = document.querySelector('.fa-random').parentElement;
+    const repeatBtn = document.querySelector('.fa-repeat').parentElement;
+    const progressBarEl = document.querySelector('.flex-1.bg-gray-700');
+    const progressEl = progressBarEl.querySelector('.bg-primary');
+    const currentTimeEl = progressBarEl.previousElementSibling;
+    const durationEl = progressBarEl.nextElementSibling;
+    const volumeBarEl = document.querySelector('.w-24.bg-gray-700');
+    const volumeEl = volumeBarEl.querySelector('.bg-gray-400');
+    const volumeBtn = volumeBarEl.previousElementSibling;
+    const songCoverEl = document.querySelector('.w-12.h-12 img');
+    const songTitleEl = document.querySelector('.font-medium');
+    const songArtistEl = songTitleEl.nextElementSibling;
+    const likedBtn = document.querySelector('.fa-heart-o').parentElement;
+    const audioWaveEls = document.querySelectorAll('.audio-wave');
+
+    // 初始化歌曲列表
+    function renderSongList(songsToRender = songs) {
+      songListEl.innerHTML = '';
+      
+      songsToRender.forEach((song, index) => {
+        const isCurrentSong = index === currentSongIndex;
+        
+        const tr = document.createElement('tr');
+        tr.className = `border-b border-gray-800 hover:bg-dark-lighter/50 transition-colors ${isCurrentSong ? 'bg-dark-lighter/30' : ''}`;
+        tr.innerHTML = `
+          <td class="py-3 pr-4 w-12">
+            <span class="${isCurrentSong ? 'text-primary' : 'text-gray-400'}">${index + 1}</span>
+          </td>
+          <td class="py-3 pr-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded overflow-hidden flex-shrink-0">
+                <img src="${song.cover}" alt="${song.title}" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h4 class="font-medium ${isCurrentSong ? 'text-primary' : ''}">${song.title}</h4>
+                <p class="text-sm text-gray-400">${song.artist}</p>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 pr-4 hidden md:table-cell">
+            <p class="text-gray-400">${song.album}</p>
+          </td>
+          <td class="py-3 pr-4 hidden sm:table-cell">
+            <p class="text-gray-400">${song.duration}</p>
+          </td>
+          <td class="py-3 w-12">
+            <button class="text-gray-400 hover:text-primary play-btn" data-index="${index}">
+              ${isCurrentSong && playerState.isPlaying ? 
+                '<div class="audio-wave"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>' : 
+                '<i class="fa fa-play"></i>'
+              }
+            </button>
+          </td>
+        `;
+        
+        songListEl.appendChild(tr);
+        
+        // 添加点击事件
+        tr.addEventListener('click', (e) => {
+          // 如果点击的是播放按钮，不执行整行的点击事件
+          if (e.target.closest('.play-btn')) return;
+          
+          playSong(index);
+        });
+        
+        // 添加播放按钮点击事件
+        const playBtn = tr.querySelector('.play-btn');
+        playBtn.addEventListener('click', () => {
+          if (index === currentSongIndex && playerState.isPlaying) {
+            pauseSong();
+          } else {
+            playSong(index);
+          }
+        });
+      });
     }
-}
 
-// 调用示例
-getUserInfo('user_123456');</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between mt-8">
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                <i class="fa fa-arrow-left mr-2"></i>上一章
-                            </button>
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                下一章<i class="fa fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Python -->
-                <div id="python-content" class="tab-pane hidden">
-                    <div class="card">
-                        <h3 class="text-2xl font-bold mb-4">Python SDK 使用指南</h3>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">安装</h4>
-                            <p class="mb-4">使用 pip 安装 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-bash">pip install devconnect-sdk</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">初始化</h4>
-                            <p class="mb-4">在您的应用中初始化 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-python">from devconnect import DevConnect
-
-# 初始化 SDK
-devconnect = DevConnect(
-    api_key='YOUR_API_KEY',
-    environment='production'  # 或 'sandbox'
-)</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">基本用法</h4>
-                            <p class="mb-4">调用 API 示例：</p>
-                            <div class="code-block">
-                                <pre><code class="language-python"># 获取用户信息
-def get_user_info(user_id):
-    try:
-        user_info = devconnect.users.get(user_id)
-        print('用户信息:', user_info)
-        return user_info
-    except Exception as e:
-        print('获取用户信息失败:', e)
-        raise
-
-# 调用示例
-user_info = get_user_info('user_123456')</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between mt-8">
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                <i class="fa fa-arrow-left mr-2"></i>上一章
-                            </button>
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                下一章<i class="fa fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Java -->
-                <div id="java-content" class="tab-pane hidden">
-                    <div class="card">
-                        <h3 class="text-2xl font-bold mb-4">Java SDK 使用指南</h3>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">安装</h4>
-                            <p class="mb-4">在 pom.xml 中添加依赖：</p>
-                            <div class="code-block">
-                                <pre><code class="language-xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.devconnect&lt;/groupId&gt;
-    &lt;artifactId&gt;devconnect-sdk&lt;/artifactId&gt;
-    &lt;version&gt;1.0.0&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">初始化</h4>
-                            <p class="mb-4">在您的应用中初始化 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-java">import com.devconnect.DevConnect;
-import com.devconnect.config.Environment;
-
-// 初始化 SDK
-DevConnect devconnect = new DevConnect.Builder()
-    .apiKey("YOUR_API_KEY")
-    .environment(Environment.PRODUCTION) // 或 Environment.SANDBOX
-    .build();</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">基本用法</h4>
-                            <p class="mb-4">调用 API 示例：</p>
-                            <div class="code-block">
-                                <pre><code class="language-java">// 获取用户信息
-public UserInfo getUserInfo(String userId) {
-    try {
-        UserInfo userInfo = devconnect.users().get(userId);
-        System.out.println("用户信息: " + userInfo);
-        return userInfo;
-    } catch (Exception e) {
-        System.err.println("获取用户信息失败: " + e.getMessage());
-        throw e;
+    // 播放歌曲
+    function playSong(index) {
+      // 如果点击的是当前播放的歌曲，则暂停
+      if (index === currentSongIndex && playerState.isPlaying) {
+        pauseSong();
+        return;
+      }
+      
+      // 更新当前歌曲索引
+      currentSongIndex = index;
+      
+      // 更新播放器状态
+      playerState.isPlaying = true;
+      
+      // 更新UI
+      updatePlayerUI();
+      
+      // 渲染歌曲列表
+      renderSongList();
+      
+      // 模拟音频播放
+      simulateAudioPlay();
     }
-}
 
-// 调用示例
-UserInfo userInfo = getUserInfo("user_123456");</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between mt-8">
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                <i class="fa fa-arrow-left mr-2"></i>上一章
-                            </button>
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                下一章<i class="fa fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- PHP -->
-                <div id="php-content" class="tab-pane hidden">
-                    <div class="card">
-                        <h3 class="text-2xl font-bold mb-4">PHP SDK 使用指南</h3>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">安装</h4>
-                            <p class="mb-4">使用 Composer 安装 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-bash">composer require devconnect/sdk</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">初始化</h4>
-                            <p class="mb-4">在您的应用中初始化 SDK：</p>
-                            <div class="code-block">
-                                <pre><code class="language-php">require_once 'vendor/autoload.php';
-
-use DevConnect\DevConnect;
-
-// 初始化 SDK
-$devconnect = new DevConnect([
-    'apiKey' => 'YOUR_API_KEY',
-    'environment' => 'production' // 或 'sandbox'
-]);</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold mb-2">基本用法</h4>
-                            <p class="mb-4">调用 API 示例：</p>
-                            <div class="code-block">
-                                <pre><code class="language-php">// 获取用户信息
-function getUserInfo($userId) {
-    global $devconnect;
-    try {
-        $userInfo = $devconnect->users->get($userId);
-        echo '用户信息: ' . json_encode($userInfo);
-        return $userInfo;
-    } catch (Exception $e) {
-        echo '获取用户信息失败: ' . $e->getMessage();
-        throw $e;
+    // 暂停歌曲
+    function pauseSong() {
+      playerState.isPlaying = false;
+      updatePlayerUI();
+      renderSongList();
     }
-}
 
-// 调用示例
-$userInfo = getUserInfo('user_123456');</code></pre>
-                                <button class="copy-btn" onclick="copyCode(this)">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between mt-8">
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                <i class="fa fa-arrow-left mr-2"></i>上一章
-                            </button>
-                            <button class="text-primary hover:text-primary-dark font-medium flex items-center">
-                                下一章<i class="fa fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- API参考 -->
-    <section id="api" class="section-padding bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">API 参考</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    完整的 REST API 文档，支持各种自定义集成需求
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- API 端点列表 -->
-                <div class="card">
-                    <h3 class="text-2xl font-bold mb-6">API 端点</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="border-l-4 border-primary pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">用户管理</span>
-                                <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">GET</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/users</p>
-                        </div>
-                        
-                        <div class="border-l-4 border-blue-500 pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">创建用户</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">POST</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/users</p>
-                        </div>
-                        
-                        <div class="border-l-4 border-yellow-500 pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">更新用户</span>
-                                <span class="text-sm bg-yellow-100 text-yellow-800 px-2 py-1 rounded">PUT</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/users/{id}</p>
-                        </div>
-                        
-                        <div class="border-l-4 border-red-500 pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">删除用户</span>
-                                <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">DELETE</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/users/{id}</p>
-                        </div>
-                        
-                        <div class="border-l-4 border-primary pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">获取数据</span>
-                                <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">GET</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/data</p>
-                        </div>
-                        
-                        <div class="border-l-4 border-purple-500 pl-4 py-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">批量操作</span>
-                                <span class="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded">PATCH</span>
-                            </div>
-                            <p class="text-gray-600">/api/v1/batch</p>
-                        </div>
-                    </div>
-                    
-                    <button class="btn-primary w-full mt-8">
-                        <i class="fa fa-file-text-o mr-2"></i>查看完整API文档
-                    </button>
-                </div>
-                
-                <!-- API 示例 -->
-                <div class="card">
-                    <h3 class="text-2xl font-bold mb-6">API 调用示例</h3>
-                    
-                    <div class="mb-6">
-                        <h4 class="text-xl font-semibold mb-2">cURL</h4>
-                        <div class="code-block">
-                            <pre><code class="language-bash">curl -X GET "https://api.devconnect.com/v1/users" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json"</code></pre>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <h4 class="text-xl font-semibold mb-2">JavaScript (Fetch)</h4>
-                        <div class="code-block">
-                            <pre><code class="language-javascript">fetch('https://api.devconnect.com/v1/users', {
-  method: 'GET',
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY',
-    'Content-Type': 'application/json'
-  }
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.error('Error:', error));</code></pre>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h4 class="text-xl font-semibold mb-2">Python (Requests)</h4>
-                        <div class="code-block">
-                            <pre><code class="language-python">import requests
-
-url = 'https://api.devconnect.com/v1/users'
-headers = {
-    'Authorization': 'Bearer YOUR_API_KEY',
-    'Content-Type': 'application/json'
-}
-
-response = requests.get(url, headers=headers)
-data = response.json()
-print(data)</code></pre>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- API 测试工具 -->
-            <div class="mt-16 card">
-                <h3 class="text-2xl font-bold mb-6">API 测试工具</h3>
-                <p class="text-gray-600 mb-6">
-                    使用我们的在线测试工具，无需编写代码即可测试 API
-                </p>
-                
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            HTTP 方法
-                        </label>
-                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
-                            <option>GET</option>
-                            <option>POST</option>
-                            <option>PUT</option>
-                            <option>DELETE</option>
-                            <option>PATCH</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            API 端点
-                        </label>
-                        <input type="text" 
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
-                               placeholder="https://api.devconnect.com/v1/users"
-                               value="/api/v1/users">
-                    </div>
-                    
-                    <div class="flex items-end">
-                        <button class="btn-primary w-full">
-                            <i class="fa fa-play mr-2"></i>发送请求
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mt-6 border border-gray-300 rounded-lg p-4 bg-gray-50">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-medium">响应结果</span>
-                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">200 OK</span>
-                    </div>
-                    <div class="code-block">
-                        <pre><code class="language-json">{
-  "data": [
-    {
-      "id": "user_123456",
-      "name": "张三",
-      "email": "zhangsan@example.com",
-      "created_at": "2024-01-15T08:30:00Z",
-      "updated_at": "2024-01-15T08:30:00Z"
-    },
-    {
-      "id": "user_789012",
-      "name": "李四",
-      "email": "lisi@example.com",
-      "created_at": "2024-01-16T10:45:00Z",
-      "updated_at": "2024-01-16T10:45:00Z"
+    // 播放上一首
+    function playPrevSong() {
+      let newIndex;
+      
+      if (playerState.isShuffle) {
+        // 随机播放
+        newIndex = Math.floor(Math.random() * songs.length);
+        while (newIndex === currentSongIndex) {
+          newIndex = Math.floor(Math.random() * songs.length);
+        }
+      } else {
+        // 顺序播放
+        newIndex = currentSongIndex - 1;
+        if (newIndex < 0) {
+          newIndex = songs.length - 1;
+        }
+      }
+      
+      playSong(newIndex);
     }
-  ],
-  "meta": {
-    "total": 2,
-    "page": 1,
-    "per_page": 20
-  }
-}</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- SDK下载 -->
-    <section class="section-padding bg-gradient-to-br from-primary/90 to-primary-dark/90 text-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">下载 SDK</h2>
-                <p class="text-lg opacity-90 max-w-2xl mx-auto">
-                    我们提供多种编程语言的 SDK，让您的接入更加便捷
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-4 gap-6">
-                <!-- JavaScript SDK -->
-                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa fa-code text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">JavaScript SDK</h3>
-                    <p class="text-sm opacity-80 mb-4">支持浏览器和 Node.js</p>
-                    <div class="flex justify-center gap-2 mb-4">
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">ES6+</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">TypeScript</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Node.js</span>
-                    </div>
-                    <button class="w-full bg-white text-primary hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors">
-                        <i class="fa fa-download mr-2"></i>下载
-                    </button>
-                </div>
-                
-                <!-- Python SDK -->
-                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa fa-python text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Python SDK</h3>
-                    <p class="text-sm opacity-80 mb-4">支持 Python 3.6+</p>
-                    <div class="flex justify-center gap-2 mb-4">
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">3.6+</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Async</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Sync</span>
-                    </div>
-                    <button class="w-full bg-white text-primary hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors">
-                        <i class="fa fa-download mr-2"></i>下载
-                    </button>
-                </div>
-                
-                <!-- Java SDK -->
-                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa fa-coffee text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Java SDK</h3>
-                    <p class="text-sm opacity-80 mb-4">支持 Java 8+</p>
-                    <div class="flex justify-center gap-2 mb-4">
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Java 8+</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Maven</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Gradle</span>
-                    </div>
-                    <button class="w-full bg-white text-primary hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors">
-                        <i class="fa fa-download mr-2"></i>下载
-                    </button>
-                </div>
-                
-                <!-- PHP SDK -->
-                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa fa-server text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">PHP SDK</h3>
-                    <p class="text-sm opacity-80 mb-4">支持 PHP 7.4+</p>
-                    <div class="flex justify-center gap-2 mb-4">
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">PHP 7.4+</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">Composer</span>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded">PSR-4</span>
-                    </div>
-                    <button class="w-full bg-white text-primary hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors">
-                        <i class="fa fa-download mr-2"></i>下载
-                    </button>
-                </div>
-            </div>
-            
-            <div class="mt-12 text-center">
-                <p class="opacity-80 mb-4">需要其他语言的 SDK？</p>
-                <button class="border-2 border-white hover:bg-white hover:text-primary font-medium py-2 px-6 rounded-lg transition-all duration-300">
-                    <i class="fa fa-plus-circle mr-2"></i>请求新的 SDK
-                </button>
-            </div>
-        </div>
-    </section>
+    // 播放下一首
+    function playNextSong() {
+      let newIndex;
+      
+      if (playerState.isShuffle) {
+        // 随机播放
+        newIndex = Math.floor(Math.random() * songs.length);
+        while (newIndex === currentSongIndex) {
+          newIndex = Math.floor(Math.random() * songs.length);
+        }
+      } else {
+        // 顺序播放
+        newIndex = currentSongIndex + 1;
+        if (newIndex >= songs.length) {
+          newIndex = 0;
+        }
+      }
+      
+      playSong(newIndex);
+    }
 
-    <!-- 常见问题 -->
-    <section id="faq" class="section-padding bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">常见问题</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    解答您在接入过程中可能遇到的问题
-                </p>
-            </div>
-            
-            <div class="max-w-3xl mx-auto">
-                <div class="space-y-4">
-                    <!-- 问题1 -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
-                            <span class="text-xl font-semibold">如何获取 API 密钥？</span>
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-6">
-                            <p class="text-gray-600">
-                                注册开发者账号后，登录开发者控制台，在"API 密钥"页面可以创建和管理您的 API 密钥。每个 API 密钥都有不同的权限范围，您可以根据需要创建多个密钥。
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- 问题2 -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
-                            <span class="text-xl font-semibold">API 有调用频率限制吗？</span>
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-6">
-                            <p class="text-gray-600">
-                                是的，我们的 API 有调用频率限制。免费版用户每分钟最多可调用 60 次，标准版用户每分钟最多可调用 600 次，企业版用户每分钟最多可调用 6000 次。您可以在响应头中查看当前的使用情况。
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- 问题3 -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
-                            <span class="text-xl font-semibold">如何处理 API 错误？</span>
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-6">
-                            <p class="text-gray-600">
-                                我们的 API 使用标准的 HTTP 状态码来表示请求结果。当遇到错误时，响应体中会包含详细的错误信息和错误代码。建议您在代码中捕获这些错误并进行适当的处理，如重试机制或用户友好的错误提示。
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- 问题4 -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
-                            <span class="text-xl font-semibold">SDK 支持哪些平台？</span>
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-6">
-                            <p class="text-gray-600">
-                                我们的 SDK 支持多种平台，包括 Web（浏览器）、Node.js、Python、Java、PHP、iOS 和 Android。每个 SDK 都经过优化，以适应特定平台的特性和最佳实践。
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- 问题5 -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
-                            <span class="text-xl font-semibold">如何升级到付费版？</span>
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-6">
-                            <p class="text-gray-600">
-                                登录开发者控制台，进入"账单"页面，您可以选择适合您需求的付费计划并完成支付。升级后，您的 API 调用限制和功能将立即更新，无需更改代码。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mt-12 text-center">
-                    <p class="text-gray-600 mb-4">还有其他问题？</p>
-                    <button class="btn-primary">
-                        <i class="fa fa-headphones mr-2"></i>联系技术支持
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+    // 更新播放器UI
+    function updatePlayerUI() {
+      const currentSong = songs[currentSongIndex];
+      
+      // 更新播放/暂停按钮
+      if (playerState.isPlaying) {
+        playPauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+      } else {
+        playPauseBtn.innerHTML = '<i class="fa fa-play"></i>';
+      }
+      
+      // 更新歌曲信息
+      songCoverEl.src = currentSong.cover;
+      songTitleEl.textContent = currentSong.title;
+      songArtistEl.textContent = currentSong.artist;
+      
+      // 更新右侧边栏的歌曲封面
+      const sidebarCoverEl = document.querySelector('.w-64.h-64 img');
+      if (sidebarCoverEl) {
+        sidebarCoverEl.src = currentSong.cover;
+      }
+      
+      // 更新时长
+      durationEl.textContent = currentSong.duration;
+      
+      // 更新随机播放按钮状态
+      if (playerState.isShuffle) {
+        shuffleBtn.classList.add('text-primary');
+      } else {
+        shuffleBtn.classList.remove('text-primary');
+      }
+      
+      // 更新重复模式按钮状态
+      repeatBtn.classList.remove('text-primary');
+      if (playerState.repeatMode === 'one') {
+        repeatBtn.classList.add('text-primary');
+        repeatBtn.innerHTML = '<i class="fa fa-repeat"></i><span class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">1</span>';
+        repeatBtn.classList.add('relative');
+      } else if (playerState.repeatMode === 'all') {
+        repeatBtn.classList.add('text-primary');
+        repeatBtn.innerHTML = '<i class="fa fa-repeat"></i>';
+        repeatBtn.classList.remove('relative');
+      } else {
+        repeatBtn.innerHTML = '<i class="fa fa-repeat"></i>';
+        repeatBtn.classList.remove('relative');
+      }
+      
+      // 更新音量按钮
+      updateVolumeIcon();
+    }
 
-    <!-- 联系支持 -->
-    <section class="section-padding bg-white">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6">获取技术支持</h2>
-                    <p class="text-lg text-gray-600 mb-8">
-                        如果您在接入过程中遇到任何问题，或者有任何建议，请随时联系我们的技术支持团队
-                    </p>
-                    
-                    <div class="space-y-6">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fa fa-envelope text-primary text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold mb-1">电子邮件</h3>
-                                <p class="text-gray-600">support@devconnect.com</p>
-                                <p class="text-sm text-gray-500">通常在 24 小时内回复</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fa fa-comments text-primary text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold mb-1">在线聊天</h3>
-                                <p class="text-gray-600">工作日 9:00-18:00</p>
-                                <p class="text-sm text-gray-500">实时技术支持</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fa fa-users text-primary text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold mb-1">开发者社区</h3>
-                                <p class="text-gray-600">forum.devconnect.com</p>
-                                <p class="text-sm text-gray-500">与其他开发者交流</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="card">
-                        <h3 class="text-2xl font-bold mb-6">发送消息</h3>
-                        
-                        <form>
-                            <div class="grid md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        姓名
-                                    </label>
-                                    <input type="text" 
-                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
-                                           placeholder="请输入您的姓名">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        电子邮件
-                                    </label>
-                                    <input type="email" 
-                                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary"
-                                           placeholder="请输入您的电子邮件">
-                                </div>
-                            </div>
-                            
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    主题
-                                </label>
-                                <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <option>技术问题</option>
-                                    <option>功能请求</option>
-                                    <option>账单问题</option>
-                                    <option>其他</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    消息内容
-                                </label>
-                                <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary h-32"
-                                          placeholder="请详细描述您的问题或建议"></textarea>
-                            </div>
-                            
-                            <div class="mb-6">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <span class="ml-2 text-sm text-gray-600">
-                                        包含系统信息（帮助我们更好地诊断问题）
-                                    </span>
-                                </label>
-                            </div>
-                            
-                            <button type="submit" class="btn-primary w-full">
-                                <i class="fa fa-paper-plane mr-2"></i>发送消息
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    // 更新音量图标
+    function updateVolumeIcon() {
+      if (playerState.volume === 0) {
+        volumeBtn.innerHTML = '<i class="fa fa-volume-off"></i>';
+      } else if (playerState.volume < 50) {
+        volumeBtn.innerHTML = '<i class="fa fa-volume-down"></i>';
+      } else {
+        volumeBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+      }
+    }
 
-    <!-- 行动召唤 -->
-    <section class="py-20 bg-gradient-to-r from-primary to-primary-dark text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">准备好开始接入了吗？</h2>
-            <p class="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-                加入 thousands of developers who are already using our API to power their applications
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="bg-white text-primary hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-lg">
-                    <i class="fa fa-rocket mr-2"></i>立即注册
-                </button>
-                <button class="border-2 border-white hover:bg-white hover:text-primary font-medium py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 text-lg">
-                    <i class="fa fa-calendar mr-2"></i>预约演示
-                </button>
-            </div>
-        </div>
-    </section>
+    // 模拟音频播放进度
+    function simulateAudioPlay() {
+      if (!playerState.isPlaying) return;
+      
+      const currentSong = songs[currentSongIndex];
+      const [minutes, seconds] = currentSong.duration.split(':').map(Number);
+      const totalSeconds = minutes * 60 + seconds;
+      
+      let currentSeconds = 0;
+      const interval = setInterval(() => {
+        if (!playerState.isPlaying) {
+          clearInterval(interval);
+          return;
+        }
+        
+        currentSeconds++;
+        const progress = (currentSeconds / totalSeconds) * 100;
+        
+        // 更新进度条
+        progressEl.style.width = `${progress}%`;
+        
+        // 更新当前时间
+        const currentMinutes = Math.floor(currentSeconds / 60);
+        const currentSecs = currentSeconds % 60;
+        currentTimeEl.textContent = `${currentMinutes}:${currentSecs < 10 ? '0' : ''}${currentSecs}`;
+        
+        // 歌曲播放结束
+        if (currentSeconds >= totalSeconds) {
+          clearInterval(interval);
+          
+          if (playerState.repeatMode === 'one') {
+            // 重复当前歌曲
+            currentSeconds = 0;
+            simulateAudioPlay();
+          } else {
+            // 播放下一首
+            playNextSong();
+          }
+        }
+      }, 1000);
+    }
 
-    <!-- 页脚 -->
-    <footer class="bg-dark text-white pt-16 pb-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <div class="flex items-center space-x-2 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                            <i class="fa fa-code text-white text-xl"></i>
-                        </div>
-                        <span class="text-xl font-bold">DevConnect</span>
-                    </div>
-                    <p class="text-gray-400 mb-6">
-                        简单高效的 API 接入解决方案，为您的应用提供强大动力
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa fa-github text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa fa-linkedin text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa fa-youtube text-xl"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">产品</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API 文档</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">SDK</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">定价</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">示例</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">状态页面</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">资源</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">开发者中心</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">博客</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">教程</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">社区论坛</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">合作伙伴</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">公司</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">关于我们</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">招贤纳士</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">服务条款</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 pt-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <p class="text-gray-400 text-sm mb-4 md:mb-0">
-                        &copy; 2024 DevConnect. 保留所有权利。
-                    </p>
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">隐私政策</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">服务条款</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Cookie 设置</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    // 格式化时间
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
 
-    <!-- 返回顶部按钮 -->
-    <button id="back-to-top" class="fixed bottom-8 right-8 bg-primary hover:bg-primary-dark text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 invisible">
-        <i class="fa fa-chevron-up"></i>
-    </button>
+    // 搜索歌曲
+    function searchSongs(query) {
+      if (!query) {
+        renderSongList();
+        return;
+      }
+      
+      const filteredSongs = songs.filter(song => 
+        song.title.toLowerCase().includes(query.toLowerCase()) || 
+        song.artist.toLowerCase().includes(query.toLowerCase()) || 
+        song.album.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      renderSongList(filteredSongs);
+    }
 
-    <script>
-        // 初始化代码高亮
-        document.addEventListener('DOMContentLoaded', () => {
-            hljs.highlightAll();
-            
-            // 移动端菜单切换
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-            
-            // 文档标签页切换
-            const docTabs = document.querySelectorAll('.doc-tab');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            
-            docTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.dataset.tab;
-                    
-                    // 移除所有活动状态
-                    docTabs.forEach(t => {
-                        t.classList.remove('active', 'bg-primary', 'text-white');
-                        t.classList.add('bg-white', 'text-dark', 'hover:bg-gray-100');
-                    });
-                    
-                    tabPanes.forEach(pane => {
-                        pane.classList.add('hidden');
-                        pane.classList.remove('active');
-                    });
-                    
-                    // 添加当前活动状态
-                    tab.classList.add('active', 'bg-primary', 'text-white');
-                    tab.classList.remove('bg-white', 'text-dark', 'hover:bg-gray-100');
-                    
-                    document.getElementById(`${target}-content`).classList.remove('hidden');
-                    document.getElementById(`${target}-content`).classList.add('active');
-                });
-            });
-            
-            // FAQ 折叠面板
-            const faqToggles = document.querySelectorAll('.faq-toggle');
-            
-            faqToggles.forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                    const content = toggle.nextElementSibling;
-                    const icon = toggle.querySelector('i');
-                    
-                    content.classList.toggle('hidden');
-                    icon.classList.toggle('rotate-180');
-                });
-            });
-            
-            // 返回顶部按钮
-            const backToTopBtn = document.getElementById('back-to-top');
-            
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    backToTopBtn.classList.remove('opacity-0', 'invisible');
-                    backToTopBtn.classList.add('opacity-100', 'visible');
-                } else {
-                    backToTopBtn.classList.add('opacity-0', 'invisible');
-                    backToTopBtn.classList
+    // 切换重复模式
+    function toggleRepeatMode() {
+      if (playerState.repeatMode === 'none') {
+        playerState.repeatMode = 'all';
+      } else if (playerState.repeatMode === 'all') {
+        playerState.repeatMode = 'one';
+      } else {
+        playerState.repeatMode = 'none';
+      }
+      
+      updatePlayerUI();
+    }
+
+    // 切换随机播放
+    function toggleShuffle() {
+      playerState.isShuffle = !playerState.isShuffle;
+      updatePlayerUI();
+    }
+
+    // 设置音量
+    function setVolume(value) {
+      playerState.volume = value;
+      volumeEl.style.width = `${value}%`;
+      updateVolumeIcon();
+    }
+
+    // 设置播放进度
+    function setProgress(value) {
+      const currentSong = songs[currentSongIndex];
+      const [minutes, seconds] = currentSong.duration.split(':').map(Number);
+      const totalSeconds = minutes * 60 + seconds;
+      
+      const newSeconds = (value / 100) * totalSeconds;
+      const progress = (newSeconds / totalSeconds) * 100;
+      
+      progressEl.style.width = `${progress}%`;
+      currentTimeEl.textContent = formatTime(newSeconds);
+    }
+
+    // 切换喜欢状态
+    function toggleLiked() {
+      const isLiked = likedBtn.querySelector('.fa-heart');
+      
+      if (isLiked) {
+        likedBtn.innerHTML = '<i class="fa fa-heart-o"></i>';
+      } else {
+        likedBtn.innerHTML = '<i class="fa fa-heart text-primary"></i>';
+      }
+    }
+
+    // 初始化事件监听器
+    function initEventListeners() {
+      // 搜索功能
+      searchInputEl.addEventListener('input', (e) => {
+        searchSongs(e.target.value);
+      });
+      
+      // 移动端搜索按钮
+      mobileSearchBtn.addEventListener('click', () => {
+        mobileSearchEl.classList.toggle('hidden');
+      });
+      
+      // 播放/暂停按钮
+      playPauseBtn.addEventListener('click', () => {
+        if (playerState.isPlaying) {
+          pauseSong();
+        } else {
+          playSong(currentSongIndex);
+        }
+      });
+      
+      // 上一首按钮
+      prevBtn.addEventListener('click', playPrevSong);
+      
+      // 下一首按钮
+      nextBtn.addEventListener('click', playNextSong);
+      
+      // 随机播放按钮
+      shuffleBtn.addEventListener('click', toggleShuffle);
+      
+      // 重复模式按钮
+      repeatBtn.addEventListener('click', toggleRepeatMode);
+      
+      // 进度条点击
+      progressBarEl.addEventListener('click', (e) => {
+        const rect = progressBarEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
+        const value = (x / width) * 100;
+        
+        setProgress(value);
+      });
+      
+      // 音量条点击
+      volumeBarEl.addEventListener('click', (e) => {
+        const rect = volumeBarEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
+        const value = (x / width) * 100;
+        
+        setVolume(value);
+      });
+      
+      // 音量按钮点击（静音/取消静音）
+      volumeBtn.addEventListener('click', () => {
+        if (playerState.volume > 0) {
+          playerState.previousVolume = playerState.volume;
+          setVolume(0);
+        } else if (playerState.previousVolume) {
+          setVolume(playerState.previousVolume);
+        } else {
+          setVolume(80);
+        }
+      });
+      
+      // 喜欢按钮
+      likedBtn.addEventListener('click', toggleLiked);
+      
+      // 歌单卡片悬停效果
+      const playlistCards = document.querySelectorAll('.bg-dark-light.rounded-lg.p-4');
+      playlistCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          const playBtn = card.querySelector('.absolute.bottom-2.right-2');
+          playBtn.classList.remove('opacity-0', 'translate-y-2');
+          playBtn.classList.add('opacity-100', 'translate-y-0');
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          const playBtn = card.querySelector('.absolute.bottom-2.right-2');
+          playBtn.classList.add('opacity-0', 'translate-y-2');
+          playBtn.classList.remove('opacity-100', 'translate-y-0');
+        });
+      });
+    }
+
+    // 初始化音乐播放器
+    function initPlayer() {
+      renderSongList();
+      updatePlayerUI();
+      initEventListeners();
+      
+      // 模拟加载完成后自动播放第一首歌
+      setTimeout(() => {
+        playSong(0);
+      }, 1000);
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initPlayer);
+  </script>
+</body>
+</html>
